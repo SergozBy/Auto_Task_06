@@ -4,6 +4,8 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
+import java.util.Objects;
+
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
@@ -24,8 +26,15 @@ public class DashboardPage {
     }
 
     public int getCardBalance(String id) {
-        // TODO: перебрать все карты и найти по атрибуту data-test-id
-
+        // DONE: My search for card by "data-test-id" and check balance on it
+        var text = "";
+        for (SelenideElement card : cards) {
+            if (Objects.equals(card.getAttribute("data-test-id"), id)) {
+                text = card.text();
+                System.out.println("Card was found");
+            }
+        }
+        System.out.println("Balance: " + extractBalance(text));
         return extractBalance(text);
     }
 
