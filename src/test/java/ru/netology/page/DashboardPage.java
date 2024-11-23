@@ -3,39 +3,42 @@ package ru.netology.page;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import ru.netology.data.DataHelper;
 
-import java.util.Objects;
-
+import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 public class DashboardPage {
-    private final SelenideElement header = $("[data-test-id='dashboard']");
-
-    private ElementsCollection cards = $$(".list__item div");
     private final String balanceStart = "баланс: ";
     private final String balanceFinish = " р.";
+
+    private final SelenideElement header = $("[data-test-id='dashboard']");
+    private ElementsCollection cards = $$(".list__item div");
+    private final SelenideElement reloadButton = $("[data-test-id='action-reload']");
 
     public DashboardPage() {
         header.shouldBe(Condition.visible);
     }
 
-    public int getFirstCardBalance() {
-        var text = cards.first().text();
+    public int getCardBalance(DataHelper.CardInfo cardInfo) {
+        var text = cards.findBy(Condition.attribute("data-test-id", cardInfo.getTestId())).getText();
         return extractBalance(text);
     }
 
-    public int getCardBalance(String id) {
-        // DONE: My search for card by "data-test-id" and check balance on it
-        var text = "";
-        for (SelenideElement card : cards) {
-            if (Objects.equals(card.getAttribute("data-test-id"), id)) {
-                text = card.text();
-                System.out.println("Card was found");
-            }
-        }
-        System.out.println("Balance: " + extractBalance(text));
+    public int getCardBalance(int index) {
+        var text = cards.get(index).getText();
         return extractBalance(text);
+    }
+
+    public TransferPage selectCardToTransfer(DataHelper.CardInfo cardInfo) {
+        cards.findBy(attribute("data-test-id", cardInfo.getTestId())).$("button").click();
+        return new TransferPage();
+    }
+
+    public void reloadDashboardPage() {
+        reloadButton.click();
+        header.shouldBe(Condition.visible);
     }
 
     private int extractBalance(String text) {
