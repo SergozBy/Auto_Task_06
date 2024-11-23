@@ -46,4 +46,16 @@ public class CardTooCardTransferTest {
                 () -> assertEquals(expectedBalanceSecondCard, actualBalanceSecondCard)
         );
     }
+
+    @Test
+    void shouldGetErrorMessageIfAmountMoreThanBalance() {
+        var amount = generateInvalidAmount(secondCardBalance);
+        var transferPage = dashboardPage.selectCardToTransfer(firstCardInfo);
+        transferPage.makeTransfer(String.valueOf(amount), secondCardInfo);
+        assertAll(() -> transferPage.findErrorMessage("Выполнено попытка перевода суммы, превышающей остаток на карте"),
+                () -> dashboardPage.reloadDashboardPage(),
+                () -> assertEquals(firstCardBalance, dashboardPage.getCardBalance(firstCardInfo)),
+                () -> assertEquals(secondCardBalance, dashboardPage.getCardBalance(secondCardInfo))
+        );
+    }
 }
